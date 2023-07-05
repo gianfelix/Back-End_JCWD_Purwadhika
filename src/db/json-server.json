@@ -1,0 +1,39 @@
+{
+  "user": [
+    {
+      "id": 1,
+      "name": "John",
+      "nominal": 55000,
+      "category": "Car",
+      "date": 1241241
+    },
+    {
+      "id": 2,
+      "name": "Maria B",
+      "nominal": 1000,
+      "category": "Ship",
+      "date": 16161644512
+    },
+    {
+      "id": 3,
+      "name": "Anton",
+      "nominal": 2000,
+      "category": "Ship",
+      "date": 1616161464512
+    },
+    {
+      "id": 4,
+      "name": "Budi",
+      "nominal": 230000,
+      "category": "Car",
+      "date": 2144444222
+    },
+    {
+      "id": 5,
+      "name": "Lukas Graham",
+      "nominal": 22700,
+      "category": "Car",
+      "date": 124444422566
+    }
+  ]
+}
