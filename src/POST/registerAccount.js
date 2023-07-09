@@ -49,21 +49,26 @@ registAccount.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { username, password, email, phone } = req.body;
+    const { username, password, confirmPassword, email, phone } = req.body;
 
     const existingUser = users.find((user) => user.email === email);
     if (existingUser) {
       return res.status(400).json({ error: "Email already exists" });
     }
 
+    console.log("existing user: ", existingUser);
+
     const hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedConfirmPassword = bcrypt.hashSync(confirmPassword, 10);
 
     const newUser = {
       username,
-      password: hashedPassword,
       email,
       phone,
+      password: hashedPassword,
+      confirmPassword: hashedConfirmPassword,
     };
+    console.log("new user: ",newUser);
 
     users.push(newUser);
     res.send("User registration successful");

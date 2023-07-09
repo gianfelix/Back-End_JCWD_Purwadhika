@@ -1,32 +1,29 @@
-import express from "express";
-import { body, validationResult } from "express-validator";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-
-const loginAccount = express.Router();
-loginAccount.use(express.json());
+const express = require ("express");
+const { body, validationResult } = require ("express-validator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
+const JWT = process.env.JWT_SECRET;
 
 const users = [
   {
     id: 1,
-    username: "antoni123",
-    email: "antoni1@gmail.com",
+    username: "antoni12",
+    email: "antoni@gmail.com",
     phone: "081802843865",
-    password: "Antoni123!",
+    password: "PassNormal!@123",
   },
 ];
 
-const JWT = "secret-key";
-
-loginAccount.post(
-  "/api/auth/login",
-  [
+const validateLogin = () => {
+    return [
     body("identifier")
       .notEmpty()
       .withMessage("Username, email, or phone number is required"),
     body("password").notEmpty().withMessage("Password is required"),
-  ],
-  (req, res) => {
+  ]}
+  const loginAccount = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -41,11 +38,13 @@ loginAccount.post(
           user.phone === identifier) &&
         user.password === password
     );
+
     if (!user) {
       return res
         .status(400)
         .json({ error: "Invalid username/email/phone or password" });
     }
+    
     const hashedPassword = bcrypt.hashSync(password, 10);
     const sessionInfo = {
       userId: user.id,
@@ -62,6 +61,6 @@ loginAccount.post(
       .status(200)
       .json({ message: "Login successful", token, sessionInfo });
   }
-);
 
-export default loginAccount;
+
+module.exports = { validateLogin, loginAccount };
