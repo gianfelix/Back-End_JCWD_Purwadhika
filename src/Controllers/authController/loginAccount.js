@@ -1,66 +1,92 @@
-const express = require ("express");
-const { body, validationResult } = require ("express-validator");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
+const JWT = require("jsonwebtoken");
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
-const JWT = process.env.JWT_SECRET;
+const bcrypt = require("bcrypt");
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
+const JWT_KEY = process.env.JWT_KEY;
+const USER = require("../../models/users");
+const { Op } = require("sequelize");
 
-const users = [
-  {
-    id: 1,
-    username: "antoni12",
-    email: "antoni@gmail.com",
-    phone: "081802843865",
-    password: "PassNormal!@123",
-  },
-];
-
-const validateLogin = () => {
-    return [
+const validationLogin = () => {
+  return [
     body("identifier")
       .notEmpty()
       .withMessage("Username, email, or phone number is required"),
-    body("password").notEmpty().withMessage("Password is required"),
-  ]}
-  const loginAccount = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    body("password")
+      .isLength({ min: 6, max: 20 })
+      .withMessage("password must be between 6 and 20 characters")
+      .matches(/^(?=.*[!@#$%^&*])(?=.*[A-Z]).+$/)
+      .withMessage(
+        "Password must contain at least one uppercase letter and one special character"
+      ),
+  ];
+};
 
-    const { identifier, password } = req.body;
+const loginAccount = async (req, res) => {
+  const err = validationResult(req);
+  if (!err.isEmpty()) {
+    return res.status(400).json({ errors: err.array() });
+  }
 
-    const user = users.find(
-      (user) =>
-        (user.username === identifier ||
-          user.email === identifier ||
-          user.phone === identifier) &&
-        user.password === password
-    );
+  const { identifier, password } = req.body;
+  try {
+    const user = await USER.findOne({
+      where: {
+        [Op.or]: [
+          { username: identifier },
+          { email: identifier },
+          { phone: identifier },
+        ],
+      },
+    });
 
     if (!user) {
       return res
         .status(400)
         .json({ error: "Invalid username/email/phone or password" });
     }
-    
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const sessionInfo = {
-      userId: user.id,
+
+    const passCheck = await bcrypt.compare(password, user.password);
+    if (!passCheck) {
+      return res
+        .status(400)
+        .json({ error: "Invalid username/email/phone or password" });
+    }
+
+    const session = {
+      user_id: user.user_id,
       username: user.username,
       email: user.email,
       phone: user.phone,
-      password: hashedPassword,
-      lastLogin: new Date(),
+      password: user.password,
+      isverified: user.isverified,
     };
 
-    const token = jwt.sign({ userId: user.id }, JWT, { expiresIn: "2h" });
+    const token = JWT.sign(
+      {
+        user_id: user.user_id,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        isverified: user.isverified,
+      },
+      JWT_KEY,
+      {
+        expiresIn: "3h",
+      }
+    );
 
-    return res
-      .status(200)
-      .json({ message: "Login successful", token, sessionInfo });
+    return res.status(200).json({
+      message: "Login success",
+      data_token: token,
+      session,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Login failed",
+      error: err.message,
+    });
   }
+};
 
-
-module.exports = { validateLogin, loginAccount };
+module.exports = { validationLogin, loginAccount };

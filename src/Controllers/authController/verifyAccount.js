@@ -1,30 +1,43 @@
-// const verifyAccount = express.Router();
+const JWT = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const USER = require("../../models/users");
+const path = require("path");
+const express = require("express");
+require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
+const JWT_KEY = process.env.JWT_KEY;
 
-const verifTokens = {};
+const tokenVerify = new Map();
+const verifyAccount = async (req, res) => {
+  try {
+    const token = req.headers["authorization"].split(" ")[1];
 
-// Define token code
-const tokenExample =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    if (tokenVerify.has(token)) {
+      const expired = tokenVerify.get(token);
+      if (expired < Date.now()) {
+        return res.status(401).json({ error: "Unauthorized/ Token Invalid" });
+      }
+    }
+    const decodedToken = JWT.verify(token, JWT_KEY);
+    const username = decodedToken.username;
 
-verifTokens[tokenExample] = {
-  used: false,
-};
+    const [updated] = await USER.update(
+      { isverified: true },
+      { where: { username: username } }
+    );
 
-verifyAccount = (req,res) => {
-  try{
-    const token = req.headers.authorization.replace("Bearer ","");
-
-    if(!verifTokens[token] || verifTokens[token].used) {
-      return res.status(401).json({ success: false, err: "Invalid token", message: "Token is invalid" });
+    if (updated == 0) {
+      return res.status(404).json({
+        message: "Account not found",
+      });
     }
 
-    verifTokens[token].used = true;
-    return res.status(200).json({ success: true, message: "Token verified" });
-
-  } catch(err){
-    console.log(err);
-    return res.status(400).json({ success: false, err, message: "ERROR" });
+    tokenVerify.set(token, decodedToken.exp * 1000);
+    return res.status(200).json({
+      message: "Account verified",
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
-}
+};
 
-module.exports = verifyAccount
+module.exports = verifyAccount;

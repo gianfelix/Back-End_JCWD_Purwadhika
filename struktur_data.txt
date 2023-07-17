@@ -1,0 +1,33 @@
+src
+    Config
+        config.js
+    Controllers
+        authController
+            registerAccount
+            loginAccount
+            keepLoginAccount
+            ---
+        profileController
+            changeUsername
+            ---
+            ---
+        blogController
+            createBlog
+            ---
+            ---
+    Database
+        database
+    Migration
+        20200712032059-create-users
+        --- 
+    Models
+        user.js
+        --
+    Seeders
+        20200712032059-demo-users
+        --
+    Routers
+        authRouter
+    index.js
+.env
+panckage.json
