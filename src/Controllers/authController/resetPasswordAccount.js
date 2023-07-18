@@ -5,6 +5,7 @@ const { body, validationResult } = require("express-validator");
 const USER = require("../../models/users");
 const bcrypt = require("bcrypt");
 const JWT_KEY = process.env.JWT_KEY;
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 
 const validationResetPass = () => {
   return [

@@ -29,6 +29,21 @@ const {
     changePasswordAccount 
 } = require("../Controllers/authController/changePasswordAccount");
 
+const {
+  validationChangeUsername,
+    changeUsernameAccount
+} = require("../Controllers/authController/changeUsernameAccount");
+
+const {
+  validationChangePhone,
+  changePhoneAccount
+} = require("../Controllers/authController/changePhoneAccount");
+
+const {
+  changeEmailAccount,
+  validationChangeEmail
+} = require("../Controllers/authController/changeEmailAccount");
+
 /////////////
 const router = express.Router();
 router.use(express.json());
@@ -41,5 +56,8 @@ router.get("/", keepLoginAccount);
 router.put("/forgot-password", validationForgotPass(), forgotPasswordAccount);
 router.patch("/reset-password", validationResetPass(), resetPasswordAccount);
 router.patch("/change-password", validationChangePasword(), changePasswordAccount);
+router.patch("/change-username", validationChangeUsername(), changeUsernameAccount);
+router.patch("/change-phone", validationChangePhone(), changePhoneAccount);
+router.patch("/change-email", validationChangeEmail(), changeEmailAccount);
 
 module.exports = router;
