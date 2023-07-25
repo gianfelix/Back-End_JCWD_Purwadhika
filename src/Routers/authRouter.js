@@ -1,63 +1,52 @@
 const express = require("express");
 
-////////////////
-const {
-  register,
-  validateRegister,
-} = require("../Controllers/authController/registerAccount");
+//////////////// IMPORT
+const registerAccount = require("../Controllers/authController/registerAccount");
+const validationRegister = require("../Controllers/validator/validationRegister");
 
 const verifyAccount = require("../Controllers/authController/verifyAccount");
 
-const {
-  validationLogin,
-  loginAccount,
-} = require("../Controllers/authController/loginAccount");
+const loginAccount = require("../Controllers/authController/loginAccount");
+const validationLogin = require("../Controllers/validator/validationLogin");
 
 const keepLoginAccount = require("../Controllers/authController/keepLoginAccount");
 
-const {
-  forgotPasswordAccount,
-  validationForgotPass,
-} = require("../Controllers/authController/forgotPasswordAccount");
+const forgotPasswordAccount = require("../Controllers/authController/forgotPasswordAccount");
+const validationForgotPass = require("../Controllers/validator/validationForgotPass");
 
-const {
-  resetPasswordAccount, validationResetPass,
-} = require("../Controllers/authController/resetPasswordAccount");
+const resetPasswordAccount = require("../Controllers/authController/resetPasswordAccount");
+const validationResetPass = require("../Controllers/validator/validationResetPass");
 
-const {
-  validationChangePasword,
-    changePasswordAccount 
-} = require("../Controllers/authController/changePasswordAccount");
+const changePasswordAccount = require("../Controllers/authController/changePasswordAccount");
+const validationChangePassword = require("../Controllers/validator/validationChangePassword");
 
-const {
-  validationChangeUsername,
-    changeUsernameAccount
-} = require("../Controllers/authController/changeUsernameAccount");
+const changeUsernameAccount = require("../Controllers/authController/changeUsernameAccount");
+const validationChangeUsername = require("../Controllers/validator/validationChangeUsername");
 
-const {
-  validationChangePhone,
-  changePhoneAccount
-} = require("../Controllers/authController/changePhoneAccount");
+const changePhoneAccount = require("../Controllers/authController/changePhoneAccount");
+const validationChangePhone = require("../Controllers/validator/validationChangePhone");
 
-const {
-  changeEmailAccount,
-  validationChangeEmail
-} = require("../Controllers/authController/changeEmailAccount");
+const changeEmailAccount = require("../Controllers/authController/changeEmailAccount");
+const validationChangeEmail = require("../Controllers/validator/validationChangeEmail");
 
-/////////////
+const {showUserAccount, showUserById} = require("../Controllers/authController/showUserAccount");
+
+///////////// IMPORT index.js
 const router = express.Router();
 router.use(express.json());
 
-/////////////
-router.post("/", validateRegister(), register);
+///////////// EKSPORT REQUEST TO POSTMAN
+router.post("/", validationRegister(), registerAccount);
 router.patch("/verif-account", verifyAccount);
 router.post("/login", validationLogin(), loginAccount);
 router.get("/", keepLoginAccount);
 router.put("/forgot-password", validationForgotPass(), forgotPasswordAccount);
 router.patch("/reset-password", validationResetPass(), resetPasswordAccount);
-router.patch("/change-password", validationChangePasword(), changePasswordAccount);
+router.patch("/change-password", validationChangePassword(), changePasswordAccount);
 router.patch("/change-username", validationChangeUsername(), changeUsernameAccount);
 router.patch("/change-phone", validationChangePhone(), changePhoneAccount);
 router.patch("/change-email", validationChangeEmail(), changeEmailAccount);
+router.get("/show-users", showUserAccount);
+router.get("/show-users/:user_id", showUserById);
 
 module.exports = router;

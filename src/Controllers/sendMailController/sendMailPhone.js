@@ -9,7 +9,6 @@ const sendMailPhone = async (email) => {
       user: process.env.user_Hotmail,
       pass: process.env.pass_Hotmail,
     },});
-
   const settingsEmail = {
     from: process.env.user_Hotmail,
     to: email,
@@ -20,5 +19,4 @@ const sendMailPhone = async (email) => {
           <p>Thank you.</p>
           </body></html>`,};
   await porter.sendMail(settingsEmail);};
-
 module.exports = sendMailPhone;
