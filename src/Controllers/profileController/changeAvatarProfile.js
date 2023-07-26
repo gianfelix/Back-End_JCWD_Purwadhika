@@ -21,8 +21,7 @@ const store = multer.diskStorage({
 
 const filter = (req, file, cb) => {
   const extensionsFile = [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"];
-  const sizeMaxAllowed = 1048576;
-
+  
   if (!extensionsFile.includes(path.extname(file.originalname).toLowerCase())) {
     cb("File type not allowed, only png, jpg, jpeg, gif, svg, and webp", false);
   } else if (file.size > sizeMaxAllowed) {
@@ -32,9 +31,12 @@ const filter = (req, file, cb) => {
   }
 };
 
+const sizeMaxAllowed = 1048576;
+
 const uploadAvatar = multer({
   storage: store,
   fileFilter: filter,
+  limits: { fileSize: sizeMaxAllowed }
 }).single("avatar");
 
 const changeAvatarProfile = async (req, res) => {
